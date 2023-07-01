@@ -1,0 +1,39 @@
+---
+- name: Set facts
+  ansible.builtin.set_fact:
+    squid_config_block: "{{ lookup('template', 'templates/ubuntu-squid-env.j2') }}"
+
+- name: Ubuntu | Install environment file
+  ansible.builtin.blockinfile:
+    path: /etc/environment
+    block: "{{ squid_config_block }}"
+    backup: true
+
+- name: Ubuntu | Remove apt squid entry from installation
+  ansible.builtin.file:
+    path: /etc/apt/apt.conf.d/90curtin-aptproxy
+    state: absent
+
+- name: Ubuntu | Set apt to use squid
+  ansible.builtin.template:
+    src: ubuntu-aptproxy.j2
+    dest: /etc/apt/apt.conf.d/90ansible-aptproxy
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Ubuntu | Make sure snapd.service.d exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/snapd.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ubuntu | Set snap to use squid
+  ansible.builtin.template:
+    src: ubuntu-snapproxy.j2
+    dest: /etc/systemd/system/snapd.service.d/snap_proxy.conf
+    owner: root
+    group: root
+    mode: 0644
