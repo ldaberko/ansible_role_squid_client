@@ -1,0 +1,4 @@
+---
+# defaults file for squid_client
+squid_server: squidserver
+squid_port: 3128

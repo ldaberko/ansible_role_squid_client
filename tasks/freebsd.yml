@@ -1,0 +1,7 @@
+---
+- name: FreeBSD | Add proxy setting to pkg.conf
+  ansible.builtin.lineinfile:
+    path: /usr/local/etc/pkg.conf
+    regexp: '^#?\s*pkg_env\s'
+    line: 'pkg_env: { http_proxy: "http://squid:3128" }'
+
